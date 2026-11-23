@@ -1,0 +1,21 @@
+# Copy to .bruin.yml (gitignored) or run: python scripts/write_bruin_yml.py
+# API keys live here as Bruin "generic" connections and are injected into Python assets as env vars.
+default_environment: default
+environments:
+  default:
+    connections:
+      duckdb:
+        - name: duckdb-default
+          path: capypunk.duckdb
+      runware:            # Bruin inference assets: provider runware (patched Bruin, see patches/)
+        - name: runware-default
+          api_key: "<runware key>"
+      generic:
+        - name: RUNWARE_API_KEY
+          value: "<runware key>"
+        - name: TELEM_API_KEY
+          value: "<telem key>"
+        - name: GLASSER_API_KEY
+          value: "<glasser key>"
+        - name: ELEVENLABS_API_KEY
+          value: "<elevenlabs key>"

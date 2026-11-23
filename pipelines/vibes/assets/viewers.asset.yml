@@ -1,0 +1,23 @@
+name: vibes.viewers
+type: duckdb.seed
+description: Viewers who opted in to a vibe check with their own Instagram handle. Nobody is looked up without a row here.
+tags: [vibes, consent]
+parameters:
+  path: viewers.csv
+columns:
+  - name: handle
+    type: varchar
+    primary_key: true
+    checks:
+      - name: not_null
+      - name: unique
+      - name: pattern
+        value: "^[a-z0-9._]{1,30}$"
+  - name: opted_in_at
+    type: date
+    checks:
+      - name: not_null
+  - name: consent
+    type: varchar
+    checks:
+      - name: not_null

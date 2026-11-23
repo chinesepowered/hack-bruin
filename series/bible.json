@@ -1,0 +1,266 @@
+{
+  "title": "CapyPunk",
+  "episode_title": "Episode 1: Signature Zero",
+  "logline": "In a city where an AI reads everyone's fear, the only one it can't see is a capybara who has never panicked in its life.",
+  "world": "Halcyon City: a rain-soaked vertical megacity run by the megacorp Lumina. Lumina's Serenity Grid is an AI that reads every citizen's stress signature through thousands of floating surveillance orbs; panic gets you flagged, followed and 'calmed'. Fear is the only crime that matters. Because Yuzu's stress signature is a perfect zero, the Grid literally cannot see Yuzu, which makes Yuzu the most valuable courier in the city.",
+  "tone": "Noir cool with deadpan cute. Captivating, high stakes, glamorous adult cast, PG-13. Never explicit, never gory. Wry noir narration. Every clip should end on a beat that makes you lean in.",
+  "style": "cinematic stylized 3D animation, high-end animated feature film look, semi-realistic proportions, soft subsurface skin, detailed fur, rain-soaked neon cyberpunk megacity at night, magenta and cyan neon reflections on wet surfaces, volumetric haze, shallow depth of field, anamorphic lens flares, moody noir lighting, subtle film grain",
+  "negative_style": "no text, no watermark, no logos, no extra limbs, no distorted faces",
+  "grid_orb": "a floating chrome surveillance orb the size of a melon with a single glowing blue iris that turns red when it detects fear",
+  "characters": {
+    "yuzu": {
+      "name": "Yuzu",
+      "role": "hero: a capybara courier, perfectly and cosmically calm",
+      "look": "Yuzu, an adult capybara with warm russet-brown fur, small rounded ears, calm half-lidded dark eyes and a serene unbothered expression, a small bright-yellow yuzu citrus fruit balanced on top of its head, wearing a sleek black tactical courier harness with a small glowing cyan data-package clipped to its side",
+      "color": "#F2C94C",
+      "voice": null
+    },
+    "vex": {
+      "name": "Vex",
+      "role": "netrunner who hires Yuzu; sly, flirty, braver than she looks",
+      "look": "Vex, a striking woman in her late twenties with a sharp neon-pink asymmetric bob haircut, a thin chrome implant line tracing her left cheekbone, winged black eyeliner, a cropped black leather jacket with hot-pink LED piping over a black mesh top, fingerless gloves, a confident sly smirk",
+      "color": "#FF3EA5",
+      "voice": {
+        "voice_id": "ujoCPuNXFKVxZSRRrMHv",
+        "label": "Layla"
+      }
+    },
+    "kade": {
+      "name": "Kade",
+      "role": "street racer and smuggler; charming rogue with a secret",
+      "look": "Kade, a ruggedly handsome man around thirty with tousled dark hair, a thin scar through his left eyebrow, light stubble, an iridescent cyan holographic racing jacket and black gloves, an easy charming grin",
+      "color": "#2EE6FF",
+      "voice": {
+        "voice_id": "N2lVS1w4EtoT3dr4eOWO",
+        "label": "Callum"
+      }
+    },
+    "sable": {
+      "name": "Sable",
+      "role": "Lumina's fixer; velvet menace who knows what Yuzu really is",
+      "look": "Sable, an elegant, imposing woman in her forties with slicked-back platinum-silver hair, an immaculate white tailored high-collar suit, glowing gold circuit tattoos tracing her neck, jaw and the backs of her hands, gold irises, a calm seductive menace",
+      "color": "#E8B84A",
+      "voice": {
+        "voice_id": "pFZP5JQG7iQjIQuC4Bku",
+        "label": "Lily"
+      }
+    },
+    "narrator": {
+      "name": "Narrator",
+      "role": "noir narrator",
+      "voice": {
+        "voice_id": "wcATjh8zBDfepqUbl99V",
+        "label": "Rick"
+      }
+    },
+    "grid": {
+      "name": "The Serenity Grid",
+      "role": "the city's AI, eerily calm",
+      "voice": {
+        "voice_id": "SAz9YHcvj6GT2YYXdXww",
+        "label": "River"
+      }
+    }
+  },
+  "structure": {
+    "notes": "Two choices per playthrough, four distinct paths, every path ends on the same cliffhanger. Stills (s*) are the anchor frames; clips run between them. Clips that share a start still branch from the exact same frame; d1 and d2 end on the same still so the branches rejoin seamlessly.",
+    "clips": [
+      {
+        "id": "c01",
+        "title": "Cold Open",
+        "start": "s01",
+        "end": "s02",
+        "duration": 10,
+        "next": [
+          "c02"
+        ],
+        "beat": "Cold open. Rain, neon, a night market. Grid orbs sweep the crowd and flag panicking citizens red. Yuzu sits utterly calm by a steaming noodle stall; the orbs pass over it as if it isn't there. A Lumina billboard shows today's (fictionalized) announcement. Vex slides in, crouches to Yuzu's eye level and clips a glowing cyan canister onto Yuzu's harness: deliver it to the Old Aquarium by midnight, and don't open it. Narration hooks the premise in the first seconds."
+      },
+      {
+        "id": "c02",
+        "title": "The Warning",
+        "start": "s02",
+        "end": "s03",
+        "duration": 8,
+        "choice": {
+          "id": "ch1",
+          "prompt": "Who do you trust?",
+          "options": [
+            {
+              "label": "Trust Vex: take the rooftops",
+              "next": "a1"
+            },
+            {
+              "label": "Trust Kade: ride the undercity",
+              "next": "b1"
+            }
+          ]
+        },
+        "beat": "An orb drops low and locks onto Vex (her fear flares red). A hoverbike screeches into the alley mouth: Kade, grinning, says Vex sold Yuzu out to Lumina and the canister is a tracker. From a fire escape, Vex shouts that he's lying: rooftops, now. Ends on a tableau: Kade on the cyan-lit bike at the alley mouth, Vex on the pink-lit fire escape above, Yuzu calm in the middle. DECISION: who do you trust?"
+      },
+      {
+        "id": "a1",
+        "title": "Rooftops",
+        "start": "s04a",
+        "end": null,
+        "duration": 8,
+        "next": [
+          "c03"
+        ],
+        "beat": "Trust Vex. Yuzu and Vex sprint across rain-slick rooftops under giant holograms. The orb swarm hunts Vex's fear while Yuzu stays invisible. A red beam pins Vex; she shoves Yuzu toward a zipline cable and tells Yuzu not to stop. Yuzu slides away into the dark toward the distant glow of the Old Aquarium. Reveal: Vex was loyal, and she pays for it."
+      },
+      {
+        "id": "b1",
+        "title": "Undercity",
+        "start": "s04b",
+        "end": null,
+        "duration": 8,
+        "next": [
+          "c03"
+        ],
+        "beat": "Trust Kade. A hoverbike roars through flooded neon tunnels, Yuzu riding on the tank, ears flapping, totally unbothered. At the Old Aquarium's gates Kade stops; his glove slips and reveals a glowing gold circuit tattoo, Lumina's mark. He says sorry, it's business. Reveal: Kade was the traitor."
+      },
+      {
+        "id": "c03",
+        "title": "The Old Aquarium",
+        "start": "s05",
+        "end": "s06",
+        "duration": 8,
+        "choice": {
+          "id": "ch2",
+          "prompt": "Sable wants the package.",
+          "options": [
+            {
+              "label": "Hand it over",
+              "next": "d1"
+            },
+            {
+              "label": "Open it yourself",
+              "next": "d2"
+            }
+          ]
+        },
+        "beat": "The Old Aquarium: flooded, abandoned, jellyfish glowing in cracked tanks. Yuzu pads in alone. Sable steps out of the shadows in white, gold tattoos glowing, and asks if Yuzu knows what it is carrying. Ends on Sable facing Yuzu, hand extended. DECISION: hand it over, or open it yourself?"
+      },
+      {
+        "id": "d1",
+        "title": "The Handover",
+        "start": "s06",
+        "end": "s07",
+        "duration": 8,
+        "next": [
+          "c04"
+        ],
+        "beat": "Hand it over. Yuzu calmly nudges the canister across the wet floor to Sable. She twists it open: a hologram blooms of a Lumina lab and a baby capybara in a glass incubator labeled SUBJECT 001 / PROJECT HALCYON. Sable says Yuzu was never the courier. Yuzu was the delivery. End on an extreme close-up of Yuzu's eyes opening wide for the first time, red light in them."
+      },
+      {
+        "id": "d2",
+        "title": "The Reveal",
+        "start": "s06",
+        "end": "s07",
+        "duration": 8,
+        "next": [
+          "c04"
+        ],
+        "beat": "Open it. Yuzu paws the canister; it cracks open and a hologram projects across the jellyfish tanks: lab footage, scientists, a baby capybara labeled SUBJECT 001 / PROJECT HALCYON. Sable smiles and says now Yuzu knows what it is. End on the same extreme close-up of Yuzu's eyes opening wide for the first time, red light in them."
+      },
+      {
+        "id": "c04",
+        "title": "Target Acquired",
+        "start": "s08",
+        "end": null,
+        "duration": 10,
+        "next": [],
+        "beat": "Cliffhanger. Across Halcyon City every orb's iris turns from blue to red and swivels toward the aquarium; every billboard flips to Yuzu's face with TARGET ACQUIRED. Narration: for the first time in its life Yuzu felt something, and the Grid felt it too. A heartbeat line spikes. Smash to black."
+      }
+    ],
+    "stills": [
+      "s01",
+      "s02",
+      "s03",
+      "s04a",
+      "s04b",
+      "s05",
+      "s06",
+      "s07",
+      "s08"
+    ],
+    "stills_spec": {
+      "s01": {
+        "chars": [
+          "yuzu"
+        ],
+        "what": "c01 opening frame: Yuzu alone and calm by the noodle stall, orbs sweeping a panicking crowd, Lumina billboard"
+      },
+      "s02": {
+        "chars": [
+          "yuzu",
+          "vex"
+        ],
+        "what": "c01 end / c02 start: Vex crouched beside Yuzu clipping on the glowing canister",
+        "parent": "s01"
+      },
+      "s03": {
+        "chars": [
+          "yuzu",
+          "vex",
+          "kade"
+        ],
+        "what": "c02 end, decision 1: Kade on the hoverbike at the alley mouth, Vex on the fire escape above, Yuzu calm between them",
+        "parent": "s02"
+      },
+      "s04a": {
+        "chars": [
+          "yuzu",
+          "vex"
+        ],
+        "what": "a1 start: rooftop sprint in the rain under holograms, orbs hunting",
+        "parent": "s03"
+      },
+      "s04b": {
+        "chars": [
+          "yuzu",
+          "kade"
+        ],
+        "what": "b1 start: hoverbike roaring through a flooded neon tunnel, Yuzu on the tank",
+        "parent": "s03"
+      },
+      "s05": {
+        "chars": [
+          "yuzu"
+        ],
+        "what": "c03 start: Yuzu entering the flooded Old Aquarium, glowing jellyfish in cracked tanks"
+      },
+      "s06": {
+        "chars": [
+          "yuzu",
+          "sable"
+        ],
+        "what": "c03 end, decision 2: Sable facing Yuzu with her hand extended, gold tattoos glowing",
+        "parent": "s05"
+      },
+      "s07": {
+        "chars": [
+          "yuzu"
+        ],
+        "what": "d1/d2 shared end: extreme close-up of Yuzu's eyes opening wide in alarm for the first time, red light reflected",
+        "parent": "s06",
+        "director_note": "Frame it as a tight close-up of Yuzu's whole face rather than a macro of one eye: both eyes are WIDE open in alarm for the first time, whites visible, ears pinned back, fur bristling, a deep red glow reflected in the eyes (the red reflection is intended), the yuzu fruit tipping off-balance at the top edge of the frame. Rain and violet jellyfish glow behind. This is the moment the calm breaks."
+      },
+      "s08": {
+        "chars": [
+          "yuzu"
+        ],
+        "what": "c04 start: wide shot of Halcyon City at night, orbs with red irises, billboards showing Yuzu's face"
+      }
+    }
+  },
+  "rules": [
+    "Fictional world only: no real company, product or person names anywhere in the script. Turn real headlines into Lumina inventions.",
+    "PG-13: glamorous and flirty, never explicit; action without gore.",
+    "Yuzu never speaks. Yuzu is the calm center; humans orbit Yuzu.",
+    "Every path ends on the same cliffhanger: for the first time in its life Yuzu feels fear, and the Grid sees it.",
+    "Narration is wry noir, short sentences, present tense."
+  ],
+  "tagline": "Stay unbothered."
+}

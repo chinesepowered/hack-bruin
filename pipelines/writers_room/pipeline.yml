@@ -1,0 +1,13 @@
+name: writers_room
+default_connections:
+  duckdb: duckdb-default
+default:
+  # inject_as is spelled out on purpose: pipeline-level default secrets without it are
+  # injected under an empty name in current Bruin (see patches/ for the upstream fix).
+  secrets:
+    - key: RUNWARE_API_KEY
+      inject_as: RUNWARE_API_KEY
+    - key: TELEM_API_KEY
+      inject_as: TELEM_API_KEY
+    - key: duckdb-default
+      inject_as: duckdb-default

@@ -1,0 +1,25 @@
+# secrets: never commit
+.bruin.yml
+.env
+*.env
+studio/.env
+
+# local warehouse + caches
+*.duckdb
+*.duckdb.wal
+.venv/
+__pycache__/
+*.pyc
+logs/
+.bruin/
+
+# generated media: raw renders stay local; the player build ships web-encoded copies
+media/
+!media/.keep
+player/dist/
+demo/build/
+node_modules/
+
+logs/runs
+logs/*.log
+*.py[cod]

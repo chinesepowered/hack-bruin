@@ -1,0 +1,12 @@
+name: vibes
+default_connections:
+  duckdb: duckdb-default
+default:
+  # inject_as spelled out: see patches/ for the upstream fix to pipeline-level default secrets
+  secrets:
+    - key: RUNWARE_API_KEY
+      inject_as: RUNWARE_API_KEY
+    - key: GLASSER_API_KEY
+      inject_as: GLASSER_API_KEY
+    - key: duckdb-default
+      inject_as: duckdb-default

@@ -1,0 +1,7 @@
+{
+  "monitor_id": "448d93f8-34f0-4a95-ad90-6d56932ee01f",
+  "query": "New laws, lawsuits or product launches involving AI emotion recognition or biometric surveillance",
+  "frequency": "1d",
+  "ttl": "7d",
+  "purpose": "Findings seed the next episode's Lumina announcement."
+}
