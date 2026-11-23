@@ -1,4 +1,4 @@
-"""Write player/dist/pipeline.html: the three Bruin pipelines, their lineage and every quality check.
+"""Write site/pipeline.html: the three Bruin pipelines, their lineage and every quality check.
 
 Built from `bruin internal parse-pipeline`, so it always matches the code. Usage:
     python3 scripts/lineage_page.py <path-to-bruin-binary>
@@ -106,6 +106,6 @@ mermaid.initialize({{ startOnLoad: true, theme: "dark", flowchart: {{ useMaxWidt
 </body>
 </html>
 """
-out = REPO / "player" / "dist" / "pipeline.html"
+out = REPO / "site" / "pipeline.html"
 out.write_text(page)
 print(f"wrote {out} ({out.stat().st_size // 1024} KB): {total_assets} assets, {total_checks} checks")

@@ -69,8 +69,29 @@ def episode_data(db_path=None) -> dict:
             "headlines": headlines, "vibes": vibes, "built_at": dt.datetime.now(dt.timezone.utc).isoformat()}
 
 
+FAVICON = ("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E"
+           "%3Crect width='64' height='64' rx='14' fill='%2307080d'/%3E%3Ccircle cx='32' cy='36' r='17' fill='%23f2c94c'/%3E"
+           "%3Cpath d='M32 19c2-6 7-8 11-7-2 5-6 8-11 7z' fill='%232ee6ff'/%3E%3C/svg%3E")
+
+
+def standalone(page: str, data: dict) -> str:
+    """Wrap the player in a full HTML document for static hosting (head metadata, favicon, link previews)."""
+    head_end = page.index('<div class="wrap">')
+    head, body = page[:head_end], page[head_end:]
+    series = data.get("series") or {}
+    desc = (series.get("logline") or "").replace('"', "&quot;")
+    meta = ('<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n'
+            f'<meta name="description" content="{desc}">\n'
+            '<meta property="og:title" content="CapyPunk: Episode 1, Signature Zero">\n'
+            f'<meta property="og:description" content="{desc}">\n'
+            '<meta property="og:type" content="video.episode">\n<meta property="og:image" content="media/s03.jpg">\n'
+            '<meta name="twitter:card" content="summary_large_image">\n<meta name="theme-color" content="#07080d">\n'
+            f'<link rel="icon" href="{FAVICON}">\n')
+    return f'<!doctype html>\n<html lang="en">\n<head>\n{meta}{head}</head>\n<body>\n{body}</body>\n</html>\n'
+
+
 def build(out_dir=None) -> dict:
-    out = config.PLAYER / "dist" if out_dir is None else out_dir
+    out = config.REPO / "site" if out_dir is None else out_dir
     media_out = out / "media"
     media_out.mkdir(parents=True, exist_ok=True)
     data = episode_data()
@@ -95,6 +116,6 @@ def build(out_dir=None) -> dict:
         data["score"] = "media/score.mp3"
     template = (config.PLAYER / "template.html").read_text()
     html = template.replace("/*__EPISODE_JSON__*/null", json.dumps(data, default=str, ensure_ascii=True).replace("</", "<\\/"))
-    (out / "index.html").write_text(html)
+    (out / "index.html").write_text(standalone(html, data))
     return {"built_at": dt.datetime.now(dt.timezone.utc).replace(tzinfo=None), "path": str(out),
             "clips": len(data["clips"]), "vibes": len(data["vibes"])}

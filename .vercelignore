@@ -1,0 +1,4 @@
+# Deploy only the static site
+/*
+!/site
+!/vercel.json

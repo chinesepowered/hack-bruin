@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CapyPunk Pipelines</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@800&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;600&display=swap">
+<style>
+:root { color-scheme: dark; --ink: #07080d; --panel: #10121b; --line: #262a3a; --fg: #e8e6ef; --dim: #8d8fa3; --cyan: #2ee6ff; --yuzu: #f2c94c; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--ink); color: var(--fg); font: 15px/1.55 "IBM Plex Sans", Arial, sans-serif; }
+main { max-width: 1180px; margin: 0 auto; padding-block: 28px 60px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 22px; }
+h1 { margin: 0; font: 800 44px/1 "Big Shoulders Display", "Arial Narrow", sans-serif; text-transform: uppercase; letter-spacing: .03em; }
+h1 span { color: var(--yuzu); }
+h2 { margin: 0 0 6px; font: 800 26px/1.1 "Big Shoulders Display", "Arial Narrow", sans-serif; text-transform: uppercase; }
+h2 small { font: 500 12px "IBM Plex Mono", monospace; color: var(--dim); letter-spacing: .06em; margin-left: 8px; }
+p { margin: 0 0 12px; color: #cfcde0; max-width: 75ch; }
+.lead { font: 500 13px "IBM Plex Mono", monospace; color: var(--dim); letter-spacing: .04em; }
+.lead b { color: var(--cyan); }
+section { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 18px; min-width: 0; }
+.graph { overflow-x: auto; background: #0b0d14; border: 1px solid var(--line); border-radius: 6px; padding: 10px; margin-bottom: 12px; }
+.tbl { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 13px; }
+th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font: 600 11px "IBM Plex Mono", monospace; color: var(--dim); letter-spacing: .08em; text-transform: uppercase; }
+td:nth-child(3) { font-variant-numeric: tabular-nums; text-align: right; }
+code { font: 500 12.5px "IBM Plex Mono", monospace; color: var(--cyan); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Capy<span>Punk</span> pipelines</h1>
+  <div class="lead">3 Bruin pipelines &middot; <b>55</b> assets &middot; <b>124</b> quality checks &middot; DuckDB warehouse &middot; dashed lines are cross-pipeline reads</div>
+  
+<section>
+  <h2>Writers&#x27; room <small>pipelines/writers_room &middot; 16 assets &middot; 49 checks</small></h2>
+  <p>Today&#x27;s headlines (Telem) become a checked, branching script (Qwen4-Max).</p>
+  <div class="graph"><pre class="mermaid">graph LR
+  raw_episode2_signals[&quot;episode2_signals&quot;]
+  raw_headline_pages[&quot;headline_pages&quot;]
+  raw_headlines --&gt; raw_headline_pages
+  raw_headlines[&quot;headlines&quot;]
+  story_choice_options[&quot;choice_options&quot;]
+  story_choices[&quot;choices&quot;]
+  story_choice_options --&gt; story_choices
+  story_episode --&gt; story_choices
+  story_clips --&gt; story_choices
+  story_clips[&quot;clips&quot;]
+  story_structure --&gt; story_clips
+  story_episode --&gt; story_clips
+  story_stills --&gt; story_clips
+  story_critic[&quot;critic&quot;]
+  story_episode --&gt; story_critic
+  story_paths --&gt; story_critic
+  story_episode[&quot;episode&quot;]
+  story_headline_digest --&gt; story_episode
+  story_structure --&gt; story_episode
+  story_still_specs --&gt; story_episode
+  story_choice_options --&gt; story_episode
+  story_headline_digest[&quot;headline_digest&quot;]
+  raw_headline_pages --&gt; story_headline_digest
+  story_line_ratings[&quot;line_ratings&quot;]
+  story_lines --&gt; story_line_ratings
+  story_lines[&quot;lines&quot;]
+  story_clips --&gt; story_lines
+  story_real_entities --&gt; story_lines
+  story_paths[&quot;paths&quot;]
+  story_clips --&gt; story_paths
+  story_choices --&gt; story_paths
+  story_real_entities[&quot;real_entities&quot;]
+  story_headline_digest --&gt; story_real_entities
+  story_still_specs[&quot;still_specs&quot;]
+  story_stills[&quot;stills&quot;]
+  story_still_specs --&gt; story_stills
+  story_episode --&gt; story_stills
+  story_real_entities --&gt; story_stills
+  story_structure[&quot;structure&quot;]</pre></div>
+  <div class="tbl"><table><thead><tr><th>Asset</th><th>Type</th><th>Checks</th><th>What it does</th></tr></thead><tbody><tr><td><code>raw.episode2_signals</code></td><td>python</td><td>1</td><td>What the Telem monitor&#x27;s agent found since the last run: new items, changed values, verdicts and alerts about</td></tr><tr><td><code>raw.headline_pages</code></td><td>python</td><td>3</td><td>Full text of today&#x27;s top headlines (one per query first), read as clean markdown with Telem fetch.</td></tr><tr><td><code>raw.headlines</code></td><td>python</td><td>3</td><td>Today&#x27;s real AI and tech headlines, searched across several providers in one call each with</td></tr><tr><td><code>story.choice_options</code></td><td>python</td><td>1</td><td>The decision points from the series bible and where each option leads.</td></tr><tr><td><code>story.choices</code></td><td>duckdb.sql</td><td>3</td><td>The viewer&#x27;s decisions, with the writers&#x27; room&#x27;s final button labels.</td></tr><tr><td><code>story.clips</code></td><td>duckdb.sql</td><td>4</td><td>One row per clip, joining the bible&#x27;s fixed structure with the writers&#x27; room&#x27;s scene direction.</td></tr><tr><td><code>story.critic</code></td><td>python</td><td>3</td><td>An independent Qwen4-Max script editor scores the final episode. Its checks gate the film pipeline:</td></tr><tr><td><code>story.episode</code></td><td>python</td><td>2</td><td>The writers&#x27; room. Qwen4-Max (via Runware) writes Episode 1 from the series bible&#x27;s beat sheet and</td></tr><tr><td><code>story.headline_digest</code></td><td>python</td><td>3</td><td>Qwen4-Max (via Runware) reads today&#x27;s articles, picks the three that best fuel the story, lists every</td></tr><tr><td><code>story.line_ratings</code></td><td>inference</td><td>2</td><td>A native Bruin inference asset on Runware&#x27;s Qwen4-Max (provider: runware, our upstream patch in patches/).</td></tr><tr><td><code>story.lines</code></td><td>duckdb.sql</td><td>8</td><td>Every spoken line (on-screen dialogue) and narration line, in order, per clip.</td></tr><tr><td><code>story.paths</code></td><td>duckdb.sql</td><td>4</td><td>Every possible playthrough, walked through the story graph with a recursive query.</td></tr><tr><td><code>story.real_entities</code></td><td>duckdb.sql</td><td>2</td><td>Every real company, product and person named in today&#x27;s source articles. The fiction may never mention them.</td></tr><tr><td><code>story.still_specs</code></td><td>python</td><td>1</td><td>The anchor frames from the series bible, who appears in each, and which earlier still it continues from.</td></tr><tr><td><code>story.stills</code></td><td>duckdb.sql</td><td>4</td><td>The anchor frames to paint, with the writers&#x27; room&#x27;s image prompt for each.</td></tr><tr><td><code>story.structure</code></td><td>python</td><td>5</td><td>The episode&#x27;s fixed branching structure from the series bible (one row per clip).</td></tr></tbody></table></div>
+</section>
+<section>
+  <h2>Film <small>pipelines/film &middot; 35 assets &middot; 62 checks</small></h2>
+  <p>The story graph compiled into a render pipeline: stills, Wan clips, voices, cuts, player.</p>
+  <div class="graph"><pre class="mermaid">graph LR
+  film_cast_kade[&quot;cast_kade&quot;]
+  film_plan --&gt; film_cast_kade
+  film_cast_sable[&quot;cast_sable&quot;]
+  film_plan --&gt; film_cast_sable
+  film_cast_vex[&quot;cast_vex&quot;]
+  film_plan --&gt; film_cast_vex
+  film_cast_yuzu[&quot;cast_yuzu&quot;]
+  film_plan --&gt; film_cast_yuzu
+  film_clip_a1[&quot;clip_a1&quot;]
+  film_still_s04a --&gt; film_clip_a1
+  film_cast_yuzu --&gt; film_clip_a1
+  film_cast_vex --&gt; film_clip_a1
+  film_clip_b1[&quot;clip_b1&quot;]
+  film_still_s04b --&gt; film_clip_b1
+  film_cast_yuzu --&gt; film_clip_b1
+  film_cast_kade --&gt; film_clip_b1
+  film_clip_c01[&quot;clip_c01&quot;]
+  film_still_s01 --&gt; film_clip_c01
+  film_still_s02 --&gt; film_clip_c01
+  film_cast_yuzu --&gt; film_clip_c01
+  film_cast_vex --&gt; film_clip_c01
+  film_clip_c02[&quot;clip_c02&quot;]
+  film_still_s02 --&gt; film_clip_c02
+  film_still_s03 --&gt; film_clip_c02
+  film_cast_yuzu --&gt; film_clip_c02
+  film_cast_vex --&gt; film_clip_c02
+  film_cast_kade --&gt; film_clip_c02
+  film_clip_c03[&quot;clip_c03&quot;]
+  film_still_s05 --&gt; film_clip_c03
+  film_still_s06 --&gt; film_clip_c03
+  film_cast_yuzu --&gt; film_clip_c03
+  film_cast_sable --&gt; film_clip_c03
+  film_clip_c04[&quot;clip_c04&quot;]
+  film_still_s08 --&gt; film_clip_c04
+  film_cast_yuzu --&gt; film_clip_c04
+  film_clip_d1[&quot;clip_d1&quot;]
+  film_still_s06 --&gt; film_clip_d1
+  film_still_s07 --&gt; film_clip_d1
+  film_cast_yuzu --&gt; film_clip_d1
+  film_cast_sable --&gt; film_clip_d1
+  film_clip_d2[&quot;clip_d2&quot;]
+  film_still_s06 --&gt; film_clip_d2
+  film_still_s07 --&gt; film_clip_d2
+  film_cast_yuzu --&gt; film_clip_d2
+  film_cast_sable --&gt; film_clip_d2
+  film_cut_a1[&quot;cut_a1&quot;]
+  film_clip_a1 --&gt; film_cut_a1
+  film_narration --&gt; film_cut_a1
+  film_cut_b1[&quot;cut_b1&quot;]
+  film_clip_b1 --&gt; film_cut_b1
+  film_narration --&gt; film_cut_b1
+  film_cut_c01[&quot;cut_c01&quot;]
+  film_clip_c01 --&gt; film_cut_c01
+  film_narration --&gt; film_cut_c01
+  film_cut_c02[&quot;cut_c02&quot;]
+  film_clip_c02 --&gt; film_cut_c02
+  film_narration --&gt; film_cut_c02
+  film_cut_c03[&quot;cut_c03&quot;]
+  film_clip_c03 --&gt; film_cut_c03
+  film_narration --&gt; film_cut_c03
+  film_cut_c04[&quot;cut_c04&quot;]
+  film_clip_c04 --&gt; film_cut_c04
+  film_narration --&gt; film_cut_c04
+  film_cut_d1[&quot;cut_d1&quot;]
+  film_clip_d1 --&gt; film_cut_d1
+  film_narration --&gt; film_cut_d1
+  film_cut_d2[&quot;cut_d2&quot;]
+  film_clip_d2 --&gt; film_cut_d2
+  film_narration --&gt; film_cut_d2
+  film_manifest[&quot;manifest&quot;]
+  film_cut_c01 --&gt; film_manifest
+  film_cut_c02 --&gt; film_manifest
+  film_cut_a1 --&gt; film_manifest
+  film_cut_b1 --&gt; film_manifest
+  film_cut_c03 --&gt; film_manifest
+  film_cut_d1 --&gt; film_manifest
+  film_cut_d2 --&gt; film_manifest
+  film_cut_c04 --&gt; film_manifest
+  film_still_s01 --&gt; film_manifest
+  film_still_s02 --&gt; film_manifest
+  film_still_s03 --&gt; film_manifest
+  film_still_s04a --&gt; film_manifest
+  film_still_s04b --&gt; film_manifest
+  film_still_s05 --&gt; film_manifest
+  film_still_s06 --&gt; film_manifest
+  film_still_s07 --&gt; film_manifest
+  film_still_s08 --&gt; film_manifest
+  film_narration[&quot;narration&quot;]
+  film_plan --&gt; film_narration
+  film_plan[&quot;plan&quot;]
+  film_player[&quot;player&quot;]
+  film_manifest --&gt; film_player
+  film_spend --&gt; film_player
+  film_score --&gt; film_player
+  film_score[&quot;score&quot;]
+  film_plan --&gt; film_score
+  film_spend[&quot;spend&quot;]
+  film_clip_c01 --&gt; film_spend
+  film_clip_c02 --&gt; film_spend
+  film_clip_a1 --&gt; film_spend
+  film_clip_b1 --&gt; film_spend
+  film_clip_c03 --&gt; film_spend
+  film_clip_d1 --&gt; film_spend
+  film_clip_d2 --&gt; film_spend
+  film_clip_c04 --&gt; film_spend
+  film_still_s01 --&gt; film_spend
+  film_still_s02 --&gt; film_spend
+  film_still_s03 --&gt; film_spend
+  film_still_s04a --&gt; film_spend
+  film_still_s04b --&gt; film_spend
+  film_still_s05 --&gt; film_spend
+  film_still_s06 --&gt; film_spend
+  film_still_s07 --&gt; film_spend
+  film_still_s08 --&gt; film_spend
+  film_plan --&gt; film_spend
+  film_still_s01[&quot;still_s01&quot;]
+  film_cast_yuzu --&gt; film_still_s01
+  film_still_s02[&quot;still_s02&quot;]
+  film_cast_yuzu --&gt; film_still_s02
+  film_cast_vex --&gt; film_still_s02
+  film_still_s01 --&gt; film_still_s02
+  film_still_s03[&quot;still_s03&quot;]
+  film_cast_yuzu --&gt; film_still_s03
+  film_cast_vex --&gt; film_still_s03
+  film_cast_kade --&gt; film_still_s03
+  film_still_s02 --&gt; film_still_s03
+  film_still_s04a[&quot;still_s04a&quot;]
+  film_cast_yuzu --&gt; film_still_s04a
+  film_cast_vex --&gt; film_still_s04a
+  film_still_s03 --&gt; film_still_s04a
+  film_still_s04b[&quot;still_s04b&quot;]
+  film_cast_yuzu --&gt; film_still_s04b
+  film_cast_kade --&gt; film_still_s04b
+  film_still_s03 --&gt; film_still_s04b
+  film_still_s05[&quot;still_s05&quot;]
+  film_cast_yuzu --&gt; film_still_s05
+  film_still_s06[&quot;still_s06&quot;]
+  film_cast_yuzu --&gt; film_still_s06
+  film_cast_sable --&gt; film_still_s06
+  film_still_s05 --&gt; film_still_s06
+  film_still_s07[&quot;still_s07&quot;]
+  film_cast_yuzu --&gt; film_still_s07
+  film_still_s06 --&gt; film_still_s07
+  film_still_s08[&quot;still_s08&quot;]
+  film_cast_yuzu --&gt; film_still_s08
+  story_stills([&quot;story.stills&quot;]) -.-&gt; film_plan
+  story_clips([&quot;story.clips&quot;]) -.-&gt; film_plan
+  story_critic([&quot;story.critic&quot;]) -.-&gt; film_plan</pre></div>
+  <div class="tbl"><table><thead><tr><th>Asset</th><th>Type</th><th>Checks</th><th>What it does</th></tr></thead><tbody><tr><td><code>film.cast_kade</code></td><td>python</td><td>1</td><td>Kade&#x27;s locked character sheet (series/cast/kade.jpg), registered with Runware as a reference image.</td></tr><tr><td><code>film.cast_sable</code></td><td>python</td><td>1</td><td>Sable&#x27;s locked character sheet (series/cast/sable.jpg), registered with Runware as a reference image.</td></tr><tr><td><code>film.cast_vex</code></td><td>python</td><td>1</td><td>Vex&#x27;s locked character sheet (series/cast/vex.jpg), registered with Runware as a reference image.</td></tr><tr><td><code>film.cast_yuzu</code></td><td>python</td><td>1</td><td>Yuzu&#x27;s locked character sheet (series/cast/yuzu.jpg), registered with Runware as a reference image.</td></tr><tr><td><code>film.clip_a1</code></td><td>python</td><td>2</td><td>&quot;Rooftops&quot;: 8s rendered by Wan 3.0 Prime from still s04a, with native</td></tr><tr><td><code>film.clip_b1</code></td><td>python</td><td>2</td><td>&quot;Undercity&quot;: 8s rendered by Wan 3.0 Prime from still s04b, with native</td></tr><tr><td><code>film.clip_c01</code></td><td>python</td><td>2</td><td>&quot;Cold Open&quot;: 10s rendered by Wan 3.0 Prime between stills s01 and s02, with native</td></tr><tr><td><code>film.clip_c02</code></td><td>python</td><td>2</td><td>&quot;The Warning&quot;: 8s rendered by Wan 3.0 Prime between stills s02 and s03, with native</td></tr><tr><td><code>film.clip_c03</code></td><td>python</td><td>2</td><td>&quot;The Old Aquarium&quot;: 8s rendered by Wan 3.0 Prime between stills s05 and s06, with native</td></tr><tr><td><code>film.clip_c04</code></td><td>python</td><td>2</td><td>&quot;Target Acquired&quot;: 10s rendered by Wan 3.0 Prime from still s08, with native</td></tr><tr><td><code>film.clip_d1</code></td><td>python</td><td>2</td><td>&quot;The Handover&quot;: 8s rendered by Wan 3.0 Prime between stills s06 and s07, with native</td></tr><tr><td><code>film.clip_d2</code></td><td>python</td><td>2</td><td>&quot;The Reveal&quot;: 8s rendered by Wan 3.0 Prime between stills s06 and s07, with native</td></tr><tr><td><code>film.cut_a1</code></td><td>python</td><td>1</td><td>Final cut of &quot;Rooftops&quot;: narration mixed in (slid into gaps in the dialogue), H.264 for the web, subtitles timed from Scribe.</td></tr><tr><td><code>film.cut_b1</code></td><td>python</td><td>1</td><td>Final cut of &quot;Undercity&quot;: narration mixed in (slid into gaps in the dialogue), H.264 for the web, subtitles timed from Scribe.</td></tr><tr><td><code>film.cut_c01</code></td><td>python</td><td>1</td><td>Final cut of &quot;Cold Open&quot;: narration mixed in (slid into gaps in the dialogue), H.264 for the web, subtitles timed from Scribe.</td></tr><tr><td><code>film.cut_c02</code></td><td>python</td><td>1</td><td>Final cut of &quot;The Warning&quot;: narration mixed in (slid into gaps in the dialogue), H.264 for the web, subtitles timed from Scribe.</td></tr><tr><td><code>film.cut_c03</code></td><td>python</td><td>1</td><td>Final cut of &quot;The Old Aquarium&quot;: narration mixed in (slid into gaps in the dialogue), H.264 for the web, subtitles timed from Scribe.</td></tr><tr><td><code>film.cut_c04</code></td><td>python</td><td>1</td><td>Final cut of &quot;Target Acquired&quot;: narration mixed in (slid into gaps in the dialogue), H.264 for the web, subtitles timed from Scribe.</td></tr><tr><td><code>film.cut_d1</code></td><td>python</td><td>1</td><td>Final cut of &quot;The Handover&quot;: narration mixed in (slid into gaps in the dialogue), H.264 for the web, subtitles timed from Scribe.</td></tr><tr><td><code>film.cut_d2</code></td><td>python</td><td>1</td><td>Final cut of &quot;The Reveal&quot;: narration mixed in (slid into gaps in the dialogue), H.264 for the web, subtitles timed from Scribe.</td></tr><tr><td><code>film.manifest</code></td><td>duckdb.sql</td><td>1</td><td>Everything the player needs, one row per clip.</td></tr><tr><td><code>film.narration</code></td><td>python</td><td>1</td><td>The noir narrator&#x27;s lines, voiced by ElevenLabs (Eleven v3, voice &quot;Rick&quot;).</td></tr><tr><td><code>film.plan</code></td><td>duckdb.sql</td><td>2</td><td>The render plan and its worst-case cost (3 takes per still, 2 per clip). Blocking budget gate:</td></tr><tr><td><code>film.player</code></td><td>python</td><td>0</td><td>Builds the interactive player (player/dist) from the manifest, the story graph and any vibe checks.</td></tr><tr><td><code>film.score</code></td><td>python</td><td>2</td><td>A 60-second neo-noir synth score composed by ElevenLabs Music; the player loops it quietly under the episode.</td></tr><tr><td><code>film.spend</code></td><td>duckdb.sql</td><td>1</td><td>What the episode actually cost to render, per item, audited against the budget.</td></tr><tr><td><code>film.still_s01</code></td><td>python</td><td>3</td><td>Anchor frame s01: c01 opening frame: Yuzu alone and calm by the noodle stall, orbs sweeping a panicking crowd, Lumina billboard.</td></tr><tr><td><code>film.still_s02</code></td><td>python</td><td>3</td><td>Anchor frame s02: c01 end / c02 start: Vex crouched beside Yuzu clipping on the glowing canister.</td></tr><tr><td><code>film.still_s03</code></td><td>python</td><td>3</td><td>Anchor frame s03: c02 end, decision 1: Kade on the hoverbike at the alley mouth, Vex on the fire escape above, Yuzu calm between them.</td></tr><tr><td><code>film.still_s04a</code></td><td>python</td><td>3</td><td>Anchor frame s04a: a1 start: rooftop sprint in the rain under holograms, orbs hunting.</td></tr><tr><td><code>film.still_s04b</code></td><td>python</td><td>3</td><td>Anchor frame s04b: b1 start: hoverbike roaring through a flooded neon tunnel, Yuzu on the tank.</td></tr><tr><td><code>film.still_s05</code></td><td>python</td><td>3</td><td>Anchor frame s05: c03 start: Yuzu entering the flooded Old Aquarium, glowing jellyfish in cracked tanks.</td></tr><tr><td><code>film.still_s06</code></td><td>python</td><td>3</td><td>Anchor frame s06: c03 end, decision 2: Sable facing Yuzu with her hand extended, gold tattoos glowing.</td></tr><tr><td><code>film.still_s07</code></td><td>python</td><td>3</td><td>Anchor frame s07: d1/d2 shared end: extreme close-up of Yuzu&#x27;s eyes opening wide in alarm for the first time, red light reflected.</td></tr><tr><td><code>film.still_s08</code></td><td>python</td><td>3</td><td>Anchor frame s08: c04 start: wide shot of Halcyon City at night, orbs with red irises, billboards showing Yuzu&#x27;s face.</td></tr></tbody></table></div>
+</section>
+<section>
+  <h2>Vibe check <small>pipelines/vibes &middot; 4 assets &middot; 13 checks</small></h2>
+  <p>An opted-in viewer&#x27;s Instagram (Glasser) becomes a crew card and predicted choices.</p>
+  <div class="graph"><pre class="mermaid">graph LR
+  vibes_cards[&quot;cards&quot;]
+  vibes_personas --&gt; vibes_cards
+  vibes_ig_profiles --&gt; vibes_cards
+  vibes_ig_profiles[&quot;ig_profiles&quot;]
+  vibes_viewers --&gt; vibes_ig_profiles
+  vibes_personas[&quot;personas&quot;]
+  vibes_ig_profiles --&gt; vibes_personas
+  vibes_viewers[&quot;viewers&quot;]
+  story_paths([&quot;story.paths&quot;]) -.-&gt; vibes_personas</pre></div>
+  <div class="tbl"><table><thead><tr><th>Asset</th><th>Type</th><th>Checks</th><th>What it does</th></tr></thead><tbody><tr><td><code>vibes.cards</code></td><td>python</td><td>2</td><td>Each viewer&#x27;s crew card: their own capybara, dressed in the loadout Qwen4-Max picked from their posts,</td></tr><tr><td><code>vibes.ig_profiles</code></td><td>python</td><td>2</td><td>Each opted-in viewer&#x27;s public Instagram profile and 12 most recent posts, bought per call through Glasser</td></tr><tr><td><code>vibes.personas</code></td><td>python</td><td>4</td><td>Qwen4-Max reads each viewer&#x27;s captions and photos and casts them as a character in Halcyon City, with a</td></tr><tr><td><code>vibes.viewers</code></td><td>duckdb.seed</td><td>5</td><td>Viewers who opted in to a vibe check with their own Instagram handle. Nobody is looked up without a row here.</td></tr></tbody></table></div>
+</section>
+</main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+<script>
+mermaid.initialize({ startOnLoad: true, theme: "dark", flowchart: { useMaxWidth: false, htmlLabels: true },
+  themeVariables: { primaryColor: "#10121b", primaryBorderColor: "#2ee6ff", primaryTextColor: "#e8e6ef", lineColor: "#8d8fa3", fontFamily: "IBM Plex Mono, monospace" } });
+</script>
+</body>
+</html>

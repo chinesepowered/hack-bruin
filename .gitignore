@@ -14,8 +14,8 @@ logs/
 .bruin/
 
 # generated media: raw renders stay local; the player build ships web-encoded copies
-media/
-!media/.keep
+/media/
+!/media/.keep
 player/dist/
 demo/build/
 node_modules/
