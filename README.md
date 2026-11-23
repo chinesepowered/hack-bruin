@@ -100,6 +100,10 @@ In sandboxes that can't download GitHub release assets, add `--debug-ingestr-src
 
 Known Bruin quirk, worked around here: `accepted_values` on a Python asset that lands in DuckDB double-quotes its values, so DuckDB reads them as column names; `vibes.personas` uses an explicit SQL check instead.
 
+## Side project: CapyPunk Studio
+
+[`studio/`](studio/README.md) puts the same idea behind an agent: a visitor types a premise and an agent on HarnessRouter (Qwen4-Max on the `hermes` base) writes a playable choose-your-own-adventure skit whose scenes carry shot prompts for the film pipeline. FastAPI backend, signed sandboxed previews, owner-checked downloads, follow-up revisions, 5 unit tests. Harness ID `chrn_53247c83d5284e6a8bb6fc83084a9a3b`.
+
 ## Privacy
 
 The vibe check only runs for handles listed in `pipelines/vibes/assets/viewers.csv` by their owner. The persona schema has in-world fields only, so the model has nowhere to record guesses about age, ethnicity, religion, health, politics or sexuality, and the crew card is an original capybara, never the viewer's face. Keys live in the gitignored `.bruin.yml` and are injected as Bruin secrets.

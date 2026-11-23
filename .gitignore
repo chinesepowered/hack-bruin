@@ -23,3 +23,6 @@ node_modules/
 logs/runs
 logs/*.log
 *.py[cod]
+# HarnessRouter studio
+.env.harnessrouter
+studio/data/
