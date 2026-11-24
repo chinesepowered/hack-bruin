@@ -6,7 +6,8 @@
 
 <p align="center">
   <a href="https://capypunk.vercel.app"><b>Play the episode</b></a> &nbsp;·&nbsp;
-  <a href="demo/capypunk_demo.mp4"><b>Watch the demo (2:25)</b></a> &nbsp;·&nbsp;
+  <a href="demo/capypunk_demo.mp4"><b>Watch the demo (2:24)</b></a> &nbsp;·&nbsp;
+  <a href="demo/capypunk_playthrough.mp4"><b>Watch a playthrough (1:19)</b></a> &nbsp;·&nbsp;
   <a href="https://capypunk.vercel.app/pipeline"><b>Explore the pipeline</b></a>
 </p>
 
@@ -200,5 +201,5 @@ site/            the built, playable episode (static, deploys as-is)
 studio/          CapyPunk Studio on HarnessRouter
 patches/         our upstream Bruin patch
 scripts/         compile_film, lineage_page, screenshots, build_demo, pilot scripts
-demo/            the demo video
+demo/            the demo video and a straight playthrough (scripts/build_demo.py, scripts/build_playthrough.py)
 ```

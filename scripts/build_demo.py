@@ -1,14 +1,15 @@
 """Cut the demo video: real film clips + player/pipeline screenshots + a presenter voice-over + the score.
 
-Run after the film and vibes pipelines and scripts/screenshots.mjs. Output: demo/capypunk_demo.mp4
+Run after the film and vibes pipelines and scripts/screenshots.cjs. Output: demo/capypunk_demo.mp4
+Pass --rebuild to redraw every segment; by default, existing segments are reused and only the sound is remixed.
 """
-import json
-import subprocess
 import sys
 from pathlib import Path
 
 import duckdb
 from PIL import Image, ImageDraw, ImageFont
+
+import soundtrack  # scripts/soundtrack.py
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "lib"))
 from capypunk import clients, config, media  # noqa: E402
@@ -179,33 +180,46 @@ def main():
         "v6": "Episode two is already being written. A Telem monitor is watching tomorrow's headlines.",
     }
     voices = {k: vo(k, t) for k, t in lines.items()}
-    segs = []
-    segs.append(film_segment("c01", SEG / "01_c01.mp4"))
-    segs.append(film_segment("c02", SEG / "02_c02.mp4"))
-    segs.append(still_segment(BUILD / "choice1_frame.png", 3.5, SEG / "03_choice1.mp4"))
-    segs.append(film_segment("b1", SEG / "04_b1.mp4"))
-    segs.append(still_segment(BUILD / "title_frame.png", 6, SEG / "05_title.mp4", voices["v1"]))
-    segs.append(still_segment(BUILD / "lineage_top_frame.png", 8, SEG / "06_docs.mp4", voices["v2"]))
-    segs.append(still_segment(BUILD / "gates.png", 10, SEG / "07_gates.mp4", voices["v3"], zoom=False))
-    segs.append(still_segment(BUILD / "stills_grid.png", 10, SEG / "08_stills.mp4", voices["v4"], zoom=False))
-    segs.append(still_segment(BUILD / "crew_frame.png", 8, SEG / "09_crew.mp4", voices["v5"]))
-    segs.append(film_segment("c03", SEG / "10_c03.mp4"))
-    segs.append(still_segment(BUILD / "choice2_frame.png", 3, SEG / "11_choice2.mp4"))
-    segs.append(film_segment("d2", SEG / "12_d2.mp4"))
-    segs.append(film_segment("c04", SEG / "13_c04.mp4"))
-    segs.append(still_segment(BUILD / "end_frame.png", 6, SEG / "14_end.mp4", voices["v6"]))
-    lst = BUILD / "concat.txt"
-    lst.write_text("".join(f"file '{s}'\n" for s in segs))
-    joined = BUILD / "joined.mp4"
-    media.run(["ffmpeg", "-y", "-v", "error", "-f", "concat", "-safe", "0", "-i", str(lst), "-c", "copy", str(joined)])
-    total = media.duration(joined)
-    score = config.MEDIA / "film" / "music" / "score.mp3"
-    out = REPO / "demo" / "capypunk_demo.mp4"
-    # loop the score under everything, quietly, fading out at the end
-    media.run(["ffmpeg", "-y", "-v", "error", "-i", str(joined), "-stream_loop", "-1", "-i", str(score), "-filter_complex",
-               f"[1:a]volume=0.16,afade=t=out:st={max(total - 4, 0):.2f}:d=4[m];[0:a][m]amix=inputs=2:duration=first:normalize=0[a]",
-               "-map", "0:v", "-map", "[a]", "-c:v", "copy", "-c:a", "aac", "-b:a", "192k", "-movflags", "+faststart", str(out)])
-    print(f"demo: {out} ({media.duration(out):.1f}s, {out.stat().st_size / 1e6:.1f} MB)")
+    film = lambda cid: {"kind": "film", "src": CUTS / f"{cid}.mp4"}  # noqa: E731
+    voice = lambda k: {"kind": "voice", "src": voices[k], "delay": 0.3}  # noqa: E731  (still_segment starts lines 0.3 s in)
+    quiet = {"kind": "silence", "music_up": True}
+    # (segment, how to draw it, what plays under it)
+    plan = [
+        ("01_c01", lambda o: film_segment("c01", o), film("c01")),
+        ("02_c02", lambda o: film_segment("c02", o), film("c02")),
+        ("03_choice1", lambda o: still_segment(BUILD / "choice1_frame.png", 3.5, o), quiet),
+        ("04_b1", lambda o: film_segment("b1", o), film("b1")),
+        ("05_title", lambda o: still_segment(BUILD / "title_frame.png", 6, o, voices["v1"]), voice("v1")),
+        ("06_docs", lambda o: still_segment(BUILD / "lineage_top_frame.png", 8, o, voices["v2"]), voice("v2")),
+        ("07_gates", lambda o: still_segment(BUILD / "gates.png", 10, o, voices["v3"], zoom=False), voice("v3")),
+        ("08_stills", lambda o: still_segment(BUILD / "stills_grid.png", 10, o, voices["v4"], zoom=False), voice("v4")),
+        ("09_crew", lambda o: still_segment(BUILD / "crew_frame.png", 8, o, voices["v5"]), voice("v5")),
+        ("10_c03", lambda o: film_segment("c03", o), film("c03")),
+        ("11_choice2", lambda o: still_segment(BUILD / "choice2_frame.png", 3, o), quiet),
+        ("12_d2", lambda o: film_segment("d2", o), film("d2")),
+        ("13_c04", lambda o: film_segment("c04", o), film("c04")),
+        ("14_end", lambda o: still_segment(BUILD / "end_frame.png", 6, o, voices["v6"]), voice("v6")),
+    ]
+    rebuild = "--rebuild" in sys.argv  # otherwise reuse segments already drawn, so a sound fix keeps the picture
+    segs, sections, windows, t = [], [], [], 0.0
+    for name, draw, audio in plan:
+        seg = SEG / f"{name}.mp4"
+        if rebuild or not seg.exists():
+            draw(seg)
+        dur = soundtrack.duration(seg)
+        if audio.get("music_up"):  # nothing is said here: let the score carry it
+            windows.append((t, t + dur))
+        segs.append(seg)
+        sections.append({"name": name, "dur": dur, **audio})
+        t += dur
+    # after the last line, the score swells and fades out under the cliffhanger card
+    windows.append((t - sections[-1]["dur"] + 0.3 + media.duration(voices["v6"]) + 0.2, t + 1))
+    video = soundtrack.join_video(segs, BUILD / "joined.mp4")
+    fg = soundtrack.foreground(sections, BUILD / "audio" / "foreground.wav")
+    music = soundtrack.score(config.MEDIA / "film" / "music" / "score.mp3", t, windows, BUILD / "audio" / "score.wav")
+    out = soundtrack.master(video, fg, music, REPO / "demo" / "capypunk_demo.mp4")
+    soundtrack.report(out, sections)
+    print(f"demo: {out} ({t:.1f}s, {out.stat().st_size / 1e6:.1f} MB)")
 
 
 if __name__ == "__main__":
