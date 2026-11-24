@@ -6,12 +6,23 @@
 
 <p align="center">
   <a href="https://capypunk.vercel.app"><b>Play the episode</b></a> &nbsp;·&nbsp;
-  <a href="demo/capypunk_demo.mp4"><b>Watch the demo (2:24)</b></a> &nbsp;·&nbsp;
-  <a href="demo/capypunk_playthrough.mp4"><b>Watch a playthrough (1:19)</b></a> &nbsp;·&nbsp;
+  <a href="https://www.youtube.com/watch?v=ee45Yk1QIn0"><b>Watch the demo (2:24)</b></a> &nbsp;·&nbsp;
+  <a href="https://www.youtube.com/watch?v=T2MUumvGlD4"><b>Watch a playthrough (1:19)</b></a> &nbsp;·&nbsp;
   <a href="https://capypunk.vercel.app/pipeline"><b>Explore the pipeline</b></a>
 </p>
 
 CapyPunk is a choose-your-own-adventure cyberpunk episode starring Yuzu, a capybara courier so calm that the city's fear-reading AI can't see it. Everything on screen was produced by three Bruin pipelines: a writers' room that turns this week's real AI-surveillance headlines into a branching script, a film pipeline that shoots every branch in 1080p with lip-synced dialogue, and a vibe check that reads a viewer's Instagram to predict which choices they'll make. 124 quality checks gate the expensive steps, so a weak script, a leaked real name or an off-model frame never reaches the screen, and a fluffed line gets an automatic retake. Episode 1 has two choices, four paths and one cliffhanger, and cost $24.57 to render.
+
+<table>
+  <tr>
+    <td width="50%"><a href="https://www.youtube.com/watch?v=ee45Yk1QIn0"><img src="docs/img/watch_demo.jpg" alt="Watch the CapyPunk demo on YouTube"></a></td>
+    <td width="50%"><a href="https://www.youtube.com/watch?v=T2MUumvGlD4"><img src="docs/img/watch_playthrough.jpg" alt="Watch a playthrough of Episode 1 on YouTube"></a></td>
+  </tr>
+  <tr>
+    <td align="center"><b>The demo</b> (2:24): how three Bruin pipelines write, shoot and check the episode</td>
+    <td align="center"><b>A playthrough</b> (1:19): one path through Episode 1, exactly as the player shows it</td>
+  </tr>
+</table>
 
 ## The problem
 
