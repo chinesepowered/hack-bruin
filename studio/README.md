@@ -34,7 +34,7 @@ browser ──► FastAPI (app.py) ──► HarnessRouter Cloud  POST /v1/respo
 | Model | `qwen4-max` (Alibaba Qwen only, by the project owner's choice) |
 | Workspace | Default Workspace |
 | Memory | not sent: the service reports `memories: false` today |
-| Budgets | 80 steps, 1200 s, $2 per task |
+| Budgets | 80 steps and 1200 s per task, plus a spending cap |
 
 `harnessrouter.json` is the reviewed copy of the live setup and `instructions.md` holds the standing instructions. To change the Harness, edit them and run `python3 update_harness.py --apply`: it fetches the live Harness first (the live record wins if it was edited in the console), sends a full `PUT` with `If-Match`, and re-reads it.
 

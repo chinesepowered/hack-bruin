@@ -372,13 +372,12 @@ function drawCrew() {
 
 // ---------- making-of
 function drawStats() {
-  const usd = DATA.spend.reduce((a, r) => a + Number(r.usd || 0), 0);
   const clipsRow = DATA.spend.find((r) => r.kind === "clip") || {};
   const stillsRow = DATA.spend.find((r) => r.kind === "still") || {};
   const footage = DATA.clips.reduce((a, c) => a + Number(c.duration_s || 0), 0);
   const cr = DATA.critic || {};
   $("stats").innerHTML = [
-    [`$${usd.toFixed(2)}`, "render spend"], [`${Math.round(footage)}s`, `footage, ${DATA.paths.length} paths`],
+    [`${clipsRow.items || DATA.clips.length}`, `shots, from ${stillsRow.items || 0} anchor frames`], [`${Math.round(footage)}s`, `footage, ${DATA.paths.length} paths`],
     [`${(clipsRow.takes || 0) + (stillsRow.takes || 0)}`, "takes rendered"], [`${cr.cliffhanger ?? "-"}/10`, "critic: cliffhanger"],
   ].map(([b, s]) => `<div class="stat"><b>${b}</b><span>${s}</span></div>`).join("");
   $("srcs").innerHTML = "Inspired by today's headlines: " + DATA.headlines.map((h) => `<a href="${h.url}" target="_blank" rel="noopener">${h.real_title.replace(/</g, "&lt;")}</a>`).join(" \u00b7 ")

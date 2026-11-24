@@ -150,9 +150,12 @@ def still_segment(img, seconds, out, voice=None, zoom=True):
 
 
 def vo(name, text):
+    """A voice-over line, re-recorded only when its text changes (the text is kept next to the audio)."""
     p = BUILD / "vo" / f"{name}.mp3"
-    if not p.exists():
+    said = p.with_suffix(".txt")
+    if not p.exists() or (said.exists() and said.read_text() != text):
         clients.eleven_tts(text, PRESENTER, p, model_id="eleven_v3")
+    said.write_text(text)
     return p
 
 
@@ -163,7 +166,6 @@ def main():
     for n in ("title", "choice1", "choice2", "end", "crew", "lineage_top", "making", "map"):
         if (SHOTS / f"{n}.png").exists():
             to_frame(SHOTS / f"{n}.png", BUILD / f"{n}_frame.png")
-    spend = f["spend"]
     vibe = f["vibe"][0] if f["vibe"] else ("Spork", "Gadget Smith", 0.04)
     lines = {
         "v1": "This is CapyPunk: an interactive cyberpunk episode about the one creature a surveillance AI can't see.",
@@ -174,8 +176,8 @@ def main():
               "a path dead-ends, or the cliffhanger scores below eight.",
         "v4": "Qwen-Image paints every anchor frame from locked cast sheets. When one missed the brief, its check failed "
               "and Bruin held back that branch until it was re-shot. Wan three point oh Prime films each shot between two frames, "
-              f"with lip-synced dialogue. The whole episode cost about {round(spend)} dollars to render.",
-        "v5": f"Viewers can opt in with their own Instagram. Glass-er fetches it for about a tenth of a cent, and Qwen 4 Max "
+              "with lip-synced dialogue.",
+        "v5": f"Viewers can opt in with their own Instagram. Glass-er fetches it on demand, and Qwen 4 Max "
               f"casts them as crew. This one is {vibe[0]}, a {vibe[1]}, and the player predicts their choices.",
         "v6": "Episode two is already being written. A Telem monitor is watching tomorrow's headlines.",
     }
@@ -204,8 +206,8 @@ def main():
     segs, sections, windows, t = [], [], [], 0.0
     for name, draw, audio in plan:
         seg = SEG / f"{name}.mp4"
-        if rebuild or not seg.exists():
-            draw(seg)
+        if rebuild or not seg.exists() or ("src" in audio and Path(audio["src"]).stat().st_mtime > seg.stat().st_mtime):
+            draw(seg)  # new, or its line was re-recorded
         dur = soundtrack.duration(seg)
         if audio.get("music_up"):  # nothing is said here: let the score carry it
             windows.append((t, t + dur))

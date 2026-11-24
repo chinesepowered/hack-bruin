@@ -48,7 +48,7 @@ def episode_data(db_path=None) -> dict:
         choices = _rows(con, "SELECT option_key, choice_id, clip_id, option_idx, prompt, label, next_clip FROM story.choices ORDER BY option_key")
         lines = _rows(con, "SELECT clip_id, kind, speaker, text FROM story.lines ORDER BY ord, kind, seq")
         paths = _rows(con, "SELECT path, picks, runtime_s FROM story.paths ORDER BY path")
-        spend = _rows(con, "SELECT kind, count(*) AS items, round(sum(cost_usd), 2) AS usd, sum(takes) AS takes FROM film.spend GROUP BY 1")
+        spend = _rows(con, "SELECT kind, count(*) AS items, sum(takes) AS takes FROM film.spend GROUP BY 1")  # takes only: no costs on the page
         critic = _rows(con, "SELECT hook, stakes, characters, dialogue, cliffhanger, coherence, overall FROM story.critic")
         headlines = _rows(con, "SELECT rank, real_title, url, billboard FROM story.headline_digest ORDER BY rank")
         vibes = _rows(con, "SELECT * FROM vibes.cards") if _table_exists(con, "vibes", "cards") else []
@@ -63,6 +63,8 @@ def episode_data(db_path=None) -> dict:
         c["lines"] = [ln for ln in lines if ln["clip_id"] == c["clip_id"]]
     for v in vibes:
         v["card"] = "media/" + str(v.get("card_path", "")).split("/")[-1]
+        for k in [k for k in v if k.endswith("_usd")]:
+            del v[k]
     bible = json.loads((config.SERIES / "bible.json").read_text())
     series = {"title": bible.get("title"), "tagline": bible.get("tagline"), "logline": bible.get("logline")}
     return {"series": series, "episode": ep, "clips": clips, "paths": paths, "spend": spend, "critic": critic[0] if critic else None,

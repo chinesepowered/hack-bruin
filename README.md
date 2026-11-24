@@ -11,7 +11,7 @@
   <a href="https://capypunk.vercel.app/pipeline"><b>Explore the pipeline</b></a>
 </p>
 
-CapyPunk is a choose-your-own-adventure cyberpunk episode starring Yuzu, a capybara courier so calm that the city's fear-reading AI can't see it. Everything on screen was produced by three Bruin pipelines: a writers' room that turns this week's real AI-surveillance headlines into a branching script, a film pipeline that shoots every branch in 1080p with lip-synced dialogue, and a vibe check that reads a viewer's Instagram to predict which choices they'll make. 124 quality checks gate the expensive steps, so a weak script, a leaked real name or an off-model frame never reaches the screen, and a fluffed line gets an automatic retake. Episode 1 has two choices, four paths and one cliffhanger, and cost $24.57 to render.
+CapyPunk is a choose-your-own-adventure cyberpunk episode starring Yuzu, a capybara courier so calm that the city's fear-reading AI can't see it. Everything on screen was produced by three Bruin pipelines: a writers' room that turns this week's real AI-surveillance headlines into a branching script, a film pipeline that shoots every branch in 1080p with lip-synced dialogue, and a vibe check that reads a viewer's Instagram to predict which choices they'll make. 124 quality checks gate the expensive steps, so a weak script, a leaked real name or an off-model frame never reaches the screen, and a fluffed line gets an automatic retake. Episode 1 has two choices, four paths and one cliffhanger.
 
 <table>
   <tr>
@@ -34,7 +34,7 @@ CapyPunk treats a film like a data pipeline, and runs the whole production on Br
 
 - **The story compiles into a DAG.** The episode's branching structure becomes a Bruin pipeline with one asset per character, anchor frame and shot, wired by continuity. Bruin renders independent shots in parallel and a failure only holds back its own branch.
 - **Quality checks are the QA department.** Blocking checks stop a script the critic scores too low, a real company name leaking into the fiction, or an off-model frame, before money is spent downstream. A shot whose actors miss their lines is retaken automatically.
-- **Everything is data.** Every take, QA verdict, transcript and cent lands in DuckDB, so the player's "how it was made" panel is a query, and spend is audited against a budget gate.
+- **Everything is data.** Every take, QA verdict and transcript lands in DuckDB, so the player's "how it was made" panel is a query.
 - **Fix one thing, re-render one thing.** When one frame missed its brief, Bruin held back exactly the two shots that depend on it until it was re-shot.
 - **The story keeps up with the news.** A Telem monitor feeds the next episode's plot incrementally, straight into the warehouse.
 
@@ -45,7 +45,7 @@ CapyPunk treats a film like a data pipeline, and runs the whole production on Br
 | **Bruin** | Runs the entire production: 3 pipelines, 55 assets, 124 checks | DAG compiled from the story graph · checks as creative gates · native inference asset · upstream patch with tests |
 | **Telem** | Finds the real news that becomes the plot, and watches for the next episode | Multi-provider search with auto-routing · full-page fetch · monitor read incrementally by cursor |
 | **Runware** | Every model call, all Alibaba | Qwen4-Max writes, critiques and judges · Qwen-Image 2.1 Turbo paints consistent frames · Wan 3.0 Prime shoots 1080p branches with lip sync |
-| **Glasser** | Opt-in personalization from a viewer's own Instagram | Profile and posts for about $0.001 per viewer · every Run's charge and URL kept in the warehouse |
+| **Glasser** | Opt-in personalization from a viewer's own Instagram | Profile and recent posts on demand · every Run's URL kept in the warehouse |
 | **HarnessRouter** | CapyPunk Studio: anyone's premise becomes a playable skit | Qwen4-Max on the `hermes` base · signed sandboxed previews · follow-up revisions |
 
 ## Architecture
@@ -77,7 +77,7 @@ flowchart TB
   G --> B
   CU --> PL(["Interactive player<br/>site/"])
   CC --> PL
-  DB[("DuckDB<br/>every take, check and cent")]
+  DB[("DuckDB<br/>every take, check and transcript")]
   classDef bruin fill:#1d2a44,stroke:#2ee6ff,color:#e8e6ef
   classDef gate fill:#3a1630,stroke:#ff3ea5,color:#e8e6ef
   classDef ext fill:#2b2410,stroke:#f2c94c,color:#e8e6ef
@@ -104,14 +104,14 @@ Every step from headline to final cut is a Bruin asset in one of three pipelines
 | A valid story graph | `story.clips`, `story.choices`, `story.paths` | Dangling scene links (`relationships` checks), choices without two options, anything but four paths ending on the cliffhanger |
 | Lines fit their shots | `story.lines` | More than 20 words of dialogue in a single shot |
 | The critic signs off | `story.critic`, `film.plan` | Hook below 7, cliffhanger below 8, overall below 7 |
-| Budget | `film.plan`, `film.spend` | A worst-case render plan over budget; actual spend audited after |
+| Budget | `film.plan`, `film.spend` | A render plan whose worst case (every retake) would go over budget, checked again after rendering |
 | On-model frames | `film.still_*` | A Qwen4-Max QA score below 6 for the best of three takes |
 | The actors said their lines | `film.clip_*` | A speech-to-text transcript matching less than 60% of the script, even after a retake |
-| Personalization stays honest and cheap | `vibes.personas`, `vibes.cards` | A predicted path that doesn't exist; more than $0.10 per viewer |
+| Personalization stays honest | `vibes.personas` | A predicted path that doesn't exist in the story graph, or a pick that isn't one of the story's options |
 
 **A gate that actually fired.** The close-up where Yuzu's calm finally breaks (`film.still_s07`) missed its brief three takes running. Its check failed, Bruin held back exactly the two shots that land on it, a director's note went into the bible, and `bruin run` on that one asset re-shot it.
 
-**The warehouse is the production record.** Every take's URL, QA verdict, transcript, dialogue match, render time and charge is a row. `film.spend` audits real cost against `film.plan`'s budget, and the player's "how it was made" panel reads the same tables.
+**The warehouse is the production record.** Every take's URL, QA verdict, transcript, dialogue match and render time is a row, and the player's "how it was made" panel reads the same tables.
 
 **Incremental and surgical.** `raw.episode2_signals` merges the Telem monitor's changes by `seq`. `--downstream` re-ran only what depended on a change, and `--only checks` re-ran a fixed check without paying for the model call again. Keys come in through generic connections, and render resolution and budget are pipeline variables.
 
@@ -135,15 +135,15 @@ We also found that `accepted_values` on a Python asset landing in DuckDB double-
 | Model | Jobs in CapyPunk |
 |---|---|
 | **Qwen4-Max** | Research desk, head writer (draft, self-critique, revise), independent critic, vision QA judge for every frame and sampled shot, line rater (as a Bruin inference asset), and casting director that reads a viewer's captions and photos. Strict JSON-schema output everywhere. |
-| **Qwen-Image 2.1 Turbo** | Four locked cast sheets, nine anchor frames kept consistent with multiple references (the cast sheets plus the previous frame), and every viewer's crew card. About $0.014 an image. |
-| **Wan 3.0 Prime** | Eight shots at 1080p, each pinned between two anchor frames, so both branches of a choice leave from the exact frame on screen and both endings land on the same close-up. Characters speak their lines with native lip sync: every scripted line was spoken verbatim, verified by transcript. $24.24 for ten takes. |
+| **Qwen-Image 2.1 Turbo** | Four locked cast sheets, nine anchor frames kept consistent with multiple references (the cast sheets plus the previous frame), and every viewer's crew card. |
+| **Wan 3.0 Prime** | Eight shots at 1080p, each pinned between two anchor frames, so both branches of a choice leave from the exact frame on screen and both endings land on the same close-up. Characters speak their lines with native lip sync: every scripted line was spoken verbatim, verified by transcript. |
 
 We also wrote the `runware` provider for Bruin's inference assets (see Bruin above), so any Bruin pipeline can use Runware-hosted models for typed columns.
 
-### Glasser: paid data, on demand, with a paper trail
+### Glasser: live social data, on demand, with a paper trail
 
 - **Consent first.** A handle is looked up only if it's in [`pipelines/vibes/assets/viewers.csv`](pipelines/vibes/assets/viewers.csv), a Bruin seed with its own checks.
-- **Pay per call, audited.** `vibes.ig_profiles` calls AnyAPI's `/instagram.profile` and `/instagram.user_posts` through Glasser's API for about $0.0013 per viewer, storing each Run's charge and Run URL, with a check capping it at $0.01.
+- **A paper trail.** `vibes.ig_profiles` calls AnyAPI's `/instagram.profile` and `/instagram.user_posts` through Glasser's API and stores each Run's URL next to the data, so every lookup can be traced back to its Run.
 - **What the viewer gets.** Qwen4-Max casts them as Halcyon City crew. The demo account became "Sporkwhale", a Gadget Smith who "never leaves a box sealed", predicted to trust Kade because of a kart helmet-cam selfie. In the player, a "your vibe" badge marks the predicted choice, the timer defaults to it, and the end screen scores how true you played to your vibe.
 - **Private by design.** The persona has in-world fields only, so there's nowhere to record guesses about age, ethnicity or anything sensitive, and the crew card is the viewer's own capybara, never their face.
 
@@ -169,13 +169,12 @@ We also wrote the `runware` provider for Bruin's inference assets (see Bruin abo
 
 | | |
 |---|---|
-| Render spend | **$24.57**: $24.24 for 10 Wan takes across 8 shots, $0.33 for 23 Qwen-Image takes across 9 frames |
+| Takes | 10 Wan takes for 8 shots, 23 Qwen-Image takes for 9 anchor frames, every one scored by Qwen4-Max |
 | Production | 3 pipelines · 55 assets · 124 quality checks |
 | Episode | 2 choices · 4 paths of about a minute · 74 s of footage · 1080p |
 | Dialogue | Every scripted line spoken verbatim (transcript match 1.0 on all 7 shots with dialogue) |
 | Script | Written in 2 rounds; critic scores: hook 7, cliffhanger 8, overall 7 |
 | News | 54 headlines from 5 search providers, 5 read in full, 17 monitor findings for Episode 2 |
-| Personalization | About $0.035 per viewer (Glasser + Qwen4-Max + crew card) |
 
 ## Gallery
 
