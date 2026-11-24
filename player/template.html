@@ -79,6 +79,7 @@ button.primary:hover { filter: brightness(1.08); }
 .why { font: 400 13px/1.4 var(--body); color: #cfcde0; min-height: 1.4em; }
 
 .end { background: #000; }
+.resume { background: rgba(7,8,13,.5); }
 .end .card { font: 600 clamp(14px, 2.2vw, 22px)/1.4 var(--mono); color: var(--alarm); letter-spacing: .14em; text-transform: uppercase;
   min-height: 2.8em; text-shadow: 0 0 18px rgba(255,59,59,.5); }
 .end h2 { margin: 18px 0 0; font: 900 clamp(30px, 6vw, 64px)/.9 var(--display); text-transform: uppercase; }
@@ -167,6 +168,8 @@ button.primary:hover { filter: brightness(1.08); }
         <div class="why" id="cwhy"></div>
       </div>
     </div>
+
+    <div class="overlay resume" id="resume" hidden><button class="primary">Tap to keep playing</button></div>
 
     <div class="overlay end" id="endCard" hidden>
       <div>
@@ -260,16 +263,30 @@ function hud(c) {
 function play(id) {
   const c = clips[id];
   path.push(id); seen.add(id); store.set("seen", [...seen]); drawMap();
-  $("titleCard").hidden = true; $("choice").hidden = true; $("endCard").hidden = true;
-  load(idle, c);
-  idle.onloadeddata = null;
-  const swap = () => { idle.classList.remove("off"); active.classList.add("off"); active.pause(); [active, idle] = [idle, active]; };
-  idle.currentTime = 0;
-  idle.play().then(swap).catch(() => { swap(); });
+  $("titleCard").hidden = true; $("choice").hidden = true; $("endCard").hidden = true; $("resume").hidden = true;
+  // v plays this shot; the shot on screen keeps its last frame until v is actually playing, which over a
+  // real network takes a while. The "ended" handler belongs to v itself, whenever that swap happens.
+  const v = idle, prev = active;
+  prev.onended = null;
+  load(v, c);
+  v.currentTime = 0;
+  v.onended = () => { if (current === c) after(c); };
+  const swap = () => {
+    if (current !== c) { v.pause(); return; }
+    if (active === v) return;
+    v.classList.remove("off"); prev.classList.add("off"); prev.pause();
+    active = v; idle = prev;
+  };
+  v.play().then(swap).catch((e) => { swap(); if (e && e.name === "NotAllowedError") resume(v); });
   hud(c); current = c;
   preload(c.choice.length ? c.choice.map((o) => o.next_clip) : c.next);
-  active.onended = null;
-  setTimeout(() => { active.onended = () => after(c); }, 50);
+}
+function resume(v) { /* the browser wants a tap before this shot may play */
+  const r = $("resume"); r.hidden = false;
+  r.querySelector("button").onclick = () => { r.hidden = true; v.play().catch(() => resume(v)); };
+}
+function unlock(v) { /* Safari only lets a video play sound later if play() was first called during a tap; */
+  if (!v.getAttribute("src")) v.play().catch(() => {}); /* with no source yet, nothing plays or downloads */
 }
 function after(c) {
   if (c.choice.length) return ask(c);
@@ -321,6 +338,7 @@ function start() {
   path = []; picks = [];
   const sc = $("score");
   if (DATA.score && sc) { if (!sc.getAttribute("src")) sc.src = DATA.score; sc.volume = 0.2; sc.currentTime = 0; sc.play().catch(() => {}); }
+  unlock(active); // the spare video element; play() below starts the other one inside this same tap
   play(DATA.clips[0].clip_id);
 }
 $("playBtn").onclick = start;
